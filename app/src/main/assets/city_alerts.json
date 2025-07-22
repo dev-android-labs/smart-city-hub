@@ -1,0 +1,26 @@
+[
+  {
+    "id": "bengaluru_alert_1",
+    "title": "Road Closure Alert",
+    "message": "Major road closure on MG Road due to maintenance. Expect delays.",
+    "type": "WARNING"
+  },
+  {
+    "id": "mumbai_alert_1",
+    "title": "Local Train Delays",
+    "message": "Severe delays on Western Line due to signal issues.",
+    "type": "CRITICAL"
+  },
+  {
+    "id": "delhi_alert_1",
+    "title": "Public Advisory",
+    "message": "Wear masks in public due to increased pollution levels.",
+    "type": "INFO"
+  },
+  {
+    "id": "bengaluru_alert_2",
+    "title": "Water Supply Interruption",
+    "message": "Water supply will be interrupted in Koramangala area on July 23rd.",
+    "type": "INFO"
+  }
+]
