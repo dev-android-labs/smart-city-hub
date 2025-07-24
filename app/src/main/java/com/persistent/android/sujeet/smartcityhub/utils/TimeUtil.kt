@@ -7,11 +7,19 @@ import java.util.Locale
 /**
  * Created by SUJEET KUMAR on 7/21/2025
  */
-object TimeUtil{
+object TimeUtil {
 
     fun formatTime(time: Long): String {
         val date = Date(time)
         val format = SimpleDateFormat("dd-MMM-yyyy hh:mm a", Locale.getDefault())
         return format.format(date)
+    }
+
+    fun formatDateTime(timestamp: Long): String {
+        return SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(Date(timestamp * 1000))
+    }
+
+    fun formatHHmm(timestamp: Long): String {
+        return SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestamp * 1000))
     }
 }

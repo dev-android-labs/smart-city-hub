@@ -43,7 +43,19 @@ class WeatherRepositoryImp @Inject constructor(val apiService: WeatherApiService
 
     }
 
-    override suspend fun getFiveDayForecast(city: City): Flow<List<Forecast>> {
-        TODO("Not yet implemented")
+    override suspend fun getFiveDayForecast(city: City): Flow<Result<List<Forecast>>> = flow {
+        try {
+            val response = apiService.getFiveDayForecast(city.cityName)
+            if (response.isSuccessful) {
+
+                val forecast = response.body()
+                val forecastList = forecast?.list?.map { it.toDomain() }
+                emit(Result.SUCCESS(forecastList ?: emptyList()))
+            } else {
+                throw Exception(response.message())
+            }
+        } catch (e: Exception) {
+            emit(Result.ERROR(e.message.toString()))
+        }
     }
 }

@@ -21,11 +21,6 @@ class CityRepositoryImp @Inject constructor(val appStorage: AppDataStorage) : Ci
         emit(Result.SUCCESS(city))
     }
 
-    override suspend fun getCity(cityName: String): Flow<City> = flow {
-        val city = City.fromDisplayName(cityName) ?: City.BANGALORE
-        emit(city)
-    }
-
     override suspend fun getCities(): Flow<List<City>> {
         return flow {
             emit(AppDataStorage.cities)

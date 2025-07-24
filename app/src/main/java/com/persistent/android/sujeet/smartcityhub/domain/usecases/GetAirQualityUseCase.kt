@@ -18,6 +18,6 @@ class GetAirQualityUseCase @Inject constructor(
     }
 
     suspend operator fun invoke(city: City): Flow<Result<AirQuality>> {
-        return airQualityRepository.getAirQuality(lat, lon)
+        return airQualityRepository.getAirQuality(city)
     }
 }

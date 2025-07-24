@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -101,10 +101,12 @@ fun HomeScreen(
                         )
                     }
                     // You can add more action icons here if needed
-                    IconButton(onClick = { /* another action */ }) {
+                    IconButton(onClick = {
+                        viewModel.onIntent(StatsEvent.Refresh(uiState.city))
+                    }) {
                         Icon(
-                            imageVector = Icons.Filled.Info,
-                            contentDescription = "Share",
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = "Refresh Data",
                             tint = MaterialTheme.colorScheme.primaryContainer
                         )
                     }

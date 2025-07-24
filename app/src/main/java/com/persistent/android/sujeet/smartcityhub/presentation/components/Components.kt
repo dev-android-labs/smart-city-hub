@@ -68,7 +68,7 @@ fun HomeHeader(uiState: StatsUiState, onClick: () -> Unit) {
         )
         Text(
             modifier = Modifier.clickable(onClick = onClick),
-            text = uiState.city.cityName,
+            text = "${uiState.city.cityName}",
             style = MaterialTheme.typography.labelSmall
         )
     }

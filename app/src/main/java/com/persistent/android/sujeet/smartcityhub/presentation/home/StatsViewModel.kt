@@ -8,16 +8,14 @@ import com.persistent.android.sujeet.smartcityhub.domain.model.City
 import com.persistent.android.sujeet.smartcityhub.domain.model.Service
 import com.persistent.android.sujeet.smartcityhub.domain.model.Weather
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetAirQualityUseCase
-import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCityUseCase
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCurrentWeatherUseCase
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.SetCityUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -54,10 +52,6 @@ class StatsViewModel @Inject constructor(
 
     init {
 
-        viewModelScope.launch {
-            delay(1000*60*2)
-
-        }
     }
 
 
@@ -67,6 +61,10 @@ class StatsViewModel @Inject constructor(
 
             StatsEvent.SettingClicked -> {
                 _state.value = uiState.value.copy(showCitySelectionDialog = true)
+            }
+
+            is StatsEvent.Refresh -> {
+                refreshData(uiState.value.city)
             }
 
             StatsEvent.HelpClicked -> {
@@ -81,17 +79,14 @@ class StatsViewModel @Inject constructor(
 
             is StatsEvent.CitySelected -> {
 
-                setCityUseCase(event.city).launchIn(viewModelScope)
+                viewModelScope.launch {
+                    setCityUseCase(event.city).first()
+                }
 
                 _state.value = uiState.value.copy(
                     city = event.city,
                     showCitySelectionDialog = false
                 )
-                getWeather(event.city)
-                getAqi(event.city)
-            }
-
-            is StatsEvent.Refresh -> {
                 getWeather(event.city)
                 getAqi(event.city)
             }
@@ -182,7 +177,7 @@ class StatsViewModel @Inject constructor(
         }
     }
 
-    fun refreshData(city: City){
+    fun refreshData(city: City) {
         getWeather(city)
         getAqi(city)
     }

@@ -6,4 +6,11 @@ package com.persistent.android.sujeet.smartcityhub.domain.model
 data class Alert(
     val title: String,
     val description: String,
+    val alertType: AlertType = AlertType.INFO,
 )
+
+enum class AlertType{
+    INFO,
+    WARNING,
+    ERROR,
+}

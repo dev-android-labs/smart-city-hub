@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -25,10 +26,11 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.persistent.android.sujeet.smartcityhub.domain.model.Forecast
 import com.persistent.android.sujeet.smartcityhub.domain.model.Weather
-import com.persistent.android.sujeet.smartcityhub.presentation.home.StatsUiState
+import com.persistent.android.sujeet.smartcityhub.utils.TimeUtil
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 
 /**
  * Created by SUJEET KUMAR on 7/20/2025
@@ -40,7 +42,7 @@ fun WeatherCard(weather: Weather){
             .fillMaxWidth()
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Column(
             modifier = Modifier
@@ -133,12 +135,12 @@ fun ForecastItemCard(forecast: Forecast) {
         ) {
             Column {
                 Text(
-                    text = SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(Date(forecast.timestamp * 1000)),
+                    text = TimeUtil.formatDateTime(forecast.timestamp),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
                 Text(
-                    text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(forecast.timestamp * 1000)),
+                    text = TimeUtil.formatHHmm(forecast.timestamp),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -154,12 +156,12 @@ fun ForecastItemCard(forecast: Forecast) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "${forecast.temperature}°C",
+                        text = "${forecast.temperature.roundToInt()}°C",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.SemiBold
                     )
                     Text(
-                        text = "${forecast.minTemp}°C / ${forecast.maxTemp}°C",
+                        text = "${forecast.minTemp.roundToInt()}°C / ${forecast.maxTemp.roundToInt()}°C",
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -168,7 +170,9 @@ fun ForecastItemCard(forecast: Forecast) {
             Text(
                 text = forecast.description.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
                 fontSize = 14.sp,
-                modifier = Modifier.weight(1f).padding(start = 8.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp),
                 textAlign = androidx.compose.ui.text.style.TextAlign.End
             )
         }

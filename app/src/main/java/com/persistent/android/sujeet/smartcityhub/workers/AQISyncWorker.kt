@@ -7,14 +7,12 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.persistent.android.sujeet.smartcityhub.data.Result.ERROR
 import com.persistent.android.sujeet.smartcityhub.data.Result.SUCCESS
-import com.persistent.android.sujeet.smartcityhub.data.local.AppDataStorage
-import com.persistent.android.sujeet.smartcityhub.data.remote.model.Coord
 import com.persistent.android.sujeet.smartcityhub.domain.model.AirQuality
-import com.persistent.android.sujeet.smartcityhub.domain.model.City
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetAirQualityUseCase
-import com.persistent.android.sujeet.smartcityhub.domain.usecases.SetCityUseCase
+import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCityUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 
 /**
  * Created by SUJEET KUMAR on 7/21/2025
@@ -26,7 +24,7 @@ class AQISyncWorker @AssistedInject constructor(
     @Assisted appContext: Context, // <-- Add @Assisted here
     @Assisted workerParams: WorkerParameters, // <-- Add @Assisted here
     private val getAirQualityUseCase: GetAirQualityUseCase,
-    private val setCityUseCase: SetCityUseCase,
+    private val getCityUseCase: GetCityUseCase,
 ) : CoroutineWorker(appContext, workerParams) {
 
     val TAG = "AQISyncWorker"
@@ -37,15 +35,8 @@ class AQISyncWorker @AssistedInject constructor(
 
         try {
 
-            val result = setCityUseCase(City.BANGALORE)
-
-            val coord = Coord(
-                AppDataStorage.city.value.lat,
-                AppDataStorage.city.value.lon
-            )
-
             getAirQualityUseCase(
-                coord.lat, coord.lon
+                city = getCityUseCase().first()
             ).collect { result ->
 
                 when (result) {

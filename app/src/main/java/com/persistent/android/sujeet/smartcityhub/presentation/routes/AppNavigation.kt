@@ -44,7 +44,7 @@ fun AppNavigation(cityStatsViewModel: StatsViewModel = viewModel()) {
 
             val weatherViewModel = hiltViewModel<WeatherViewModel>()
             val weatherUiState = weatherViewModel.uiState.collectAsState()
-            WeatherScreen(weatherUiState.value, cityStatsViewModel)
+            WeatherScreen(weatherUiState.value, weatherViewModel, navController)
         }
 
         composable(route = Routes.AQIScreen.name) {

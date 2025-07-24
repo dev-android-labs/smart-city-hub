@@ -14,5 +14,5 @@ interface WeatherRepository {
     fun getCurrentWeather(): Flow<Weather>
 
     suspend fun getCurrentWeather(city: City): Flow<Result<Weather>>
-    suspend fun getFiveDayForecast(city: City): Flow<List<Forecast>>
+    suspend fun getFiveDayForecast(city: City): Flow<Result<List<Forecast>>>
 }

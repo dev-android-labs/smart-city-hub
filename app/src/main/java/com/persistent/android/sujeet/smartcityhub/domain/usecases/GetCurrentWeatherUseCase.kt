@@ -18,6 +18,6 @@ class GetCurrentWeatherUseCase @Inject constructor(
         weatherRepository.getCurrentWeather()
 
     suspend operator fun invoke(city: City): Flow<Result<Weather>> =
-        weatherRepository.getCurrentWeather(cityName)
+        weatherRepository.getCurrentWeather(city)
 
 }

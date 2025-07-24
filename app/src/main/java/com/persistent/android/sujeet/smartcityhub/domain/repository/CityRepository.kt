@@ -11,6 +11,5 @@ interface CityRepository {
 
     fun getCity(): Flow<City>
     fun selectCity(city: City): Flow<Result<City>>
-    suspend fun getCity(cityName: String): Flow<City>
     suspend fun getCities(): Flow<List<City>>
 }

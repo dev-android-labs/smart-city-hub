@@ -11,12 +11,14 @@ import com.persistent.android.sujeet.smartcityhub.data.remote.model.WeatherRespo
 object JsonLoader {
 
     fun loadWeatherResponseFromJson(context: Context): WeatherResponse {
-        val jsonString = context.assets.open("weather_response.json").bufferedReader().use { it.readText() }
+        val jsonString =
+            context.assets.open("weather_response.json").bufferedReader().use { it.readText() }
         return Gson().fromJson(jsonString, WeatherResponse::class.java)
     }
 
-    fun loadAqiResponseFromJson(context: Context): AQIResponse{
-        val jsonString = context.assets.open("aqi_response.json").bufferedReader().use { it.readText() }
+    fun loadAqiResponseFromJson(context: Context): AQIResponse {
+        val jsonString =
+            context.assets.open("aqi_response.json").bufferedReader().use { it.readText() }
         return Gson().fromJson(jsonString, AQIResponse::class.java)
     }
 }

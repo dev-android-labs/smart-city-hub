@@ -7,11 +7,12 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.persistent.android.sujeet.smartcityhub.data.Result.ERROR
 import com.persistent.android.sujeet.smartcityhub.data.Result.SUCCESS
-import com.persistent.android.sujeet.smartcityhub.data.local.AppDataStorage
 import com.persistent.android.sujeet.smartcityhub.domain.model.Weather
+import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCityUseCase
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCurrentWeatherUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.flow.first
 
 /**
  * Created by SUJEET KUMAR on 7/21/2025
@@ -23,6 +24,7 @@ class WeatherSyncWorker @AssistedInject constructor(
     @Assisted appContext: Context, // <-- Add @Assisted here
     @Assisted workerParams: WorkerParameters, // <-- Add @Assisted here
     private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
+    private val getCityUseCase: GetCityUseCase,
 ) : CoroutineWorker(appContext, workerParams) {
 
     val TAG = "WeatherSyncWorker"
@@ -33,7 +35,7 @@ class WeatherSyncWorker @AssistedInject constructor(
 
         try {
             getCurrentWeatherUseCase(
-                AppDataStorage.city.value.cityName
+                getCityUseCase().first()
             ).collect { result ->
 
                 when (result) {

@@ -5,6 +5,7 @@ import com.persistent.android.sujeet.smartcityhub.domain.model.Alert
 import com.persistent.android.sujeet.smartcityhub.domain.model.City
 import com.persistent.android.sujeet.smartcityhub.domain.model.Service
 import com.persistent.android.sujeet.smartcityhub.domain.model.Weather
+import com.persistent.android.sujeet.smartcityhub.utils.WEATHER_ICON_URL
 
 /**
  * Created by SUJEET KUMAR on 7/22/2025
@@ -22,7 +23,7 @@ data class StatsUiState(
         humidity = 60,
         condition = "Rain",
         description = "moderate rain",
-        iconUrl = "https://openweathermap.org/img/wn/02d@2x.png",
+        iconUrl = WEATHER_ICON_URL,
         icon = "02d",
         windSpeed = 4.09,
         sunrise = 1726636384,
