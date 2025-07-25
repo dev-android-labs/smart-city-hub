@@ -9,6 +9,6 @@ import javax.inject.Inject
 /**
  * Created by SUJEET KUMAR on 7/21/2025
  */
-class GetCityUseCase @Inject constructor(val cityRepository: CityRepository) {
+class GetCityUseCase @Inject constructor(private val cityRepository: CityRepository) {
     operator fun invoke(): Flow<City> = cityRepository.getCity()
 }

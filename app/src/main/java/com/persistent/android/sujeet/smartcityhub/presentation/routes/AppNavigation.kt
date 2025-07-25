@@ -11,9 +11,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.persistent.android.sujeet.smartcityhub.presentation.alerts.AlertUiState
 import com.persistent.android.sujeet.smartcityhub.presentation.alerts.AlertsScreen
+import com.persistent.android.sujeet.smartcityhub.presentation.aqi.AQIScreen
+import com.persistent.android.sujeet.smartcityhub.presentation.aqi.AirQualityViewModel
 import com.persistent.android.sujeet.smartcityhub.presentation.home.HomeScreen
 import com.persistent.android.sujeet.smartcityhub.presentation.home.StatsViewModel
-import com.persistent.android.sujeet.smartcityhub.presentation.screens.AQIScreen
 import com.persistent.android.sujeet.smartcityhub.presentation.screens.SplashScreen
 import com.persistent.android.sujeet.smartcityhub.presentation.weather.WeatherScreen
 import com.persistent.android.sujeet.smartcityhub.presentation.weather.WeatherViewModel
@@ -48,7 +49,9 @@ fun AppNavigation(cityStatsViewModel: StatsViewModel = viewModel()) {
         }
 
         composable(route = Routes.AQIScreen.name) {
-            AQIScreen()
+            val airQualityViewModel = hiltViewModel<AirQualityViewModel>()
+            val airQualityUiState = airQualityViewModel.uiState.collectAsState()
+            AQIScreen(airQualityUiState.value, airQualityViewModel, navController)
         }
 
         composable(route = Routes.AlertScreen.name) {

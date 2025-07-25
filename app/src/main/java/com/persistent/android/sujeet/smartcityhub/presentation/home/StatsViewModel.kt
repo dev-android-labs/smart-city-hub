@@ -1,5 +1,6 @@
 package com.persistent.android.sujeet.smartcityhub.presentation.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.persistent.android.sujeet.smartcityhub.data.Result
@@ -8,16 +9,22 @@ import com.persistent.android.sujeet.smartcityhub.domain.model.City
 import com.persistent.android.sujeet.smartcityhub.domain.model.Service
 import com.persistent.android.sujeet.smartcityhub.domain.model.Weather
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetAirQualityUseCase
+import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCityUseCase
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCurrentWeatherUseCase
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.SetCityUseCase
+import com.persistent.android.sujeet.smartcityhub.presentation.routes.AppEvent
+import com.persistent.android.sujeet.smartcityhub.presentation.routes.ViewEffects
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import javax.inject.Inject
 
 /**
@@ -28,70 +35,70 @@ class StatsViewModel @Inject constructor(
     val getWeatherUseCase: GetCurrentWeatherUseCase,
     val getAirQualityUseCase: GetAirQualityUseCase,
     val setCityUseCase: SetCityUseCase,
+    val getCityUseCase: GetCityUseCase,
 ) : ViewModel() {
 
-    private var _state = MutableStateFlow(StatsUiState())
+    val coroutineExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Log.d("TAG", ": ${throwable.message}")
+    }
 
-    var city = MutableStateFlow(City.BANGALORE)
+    val uiState = MutableStateFlow(StatsUiState())
 
     var viewEffects = MutableSharedFlow<ViewEffects>()
         private set
 
-    private val weather = getWeatherUseCase()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-
-    private val aqi = getAirQualityUseCase()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
-
-
-    val uiState = combine(_state, city, weather, aqi) { state, city, weather, aqi ->
-        state.copy(city = city, weather = weather, aqi = aqi)
-
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), StatsUiState())
-
-
     init {
+        viewModelScope.launch {
+            getCityUseCase().collect {
+                uiState.value = uiState.value.copy(city = it)
+                refreshData(it)
+            }
+        }
+
+//        Keep updating the data every 1 minute
+        viewModelScope.launch {
+            while (isActive) {
+                delay(1000 * 30 * 1)
+                refreshData(city = uiState.value.city)
+            }
+        }
+
 
     }
 
 
-    fun onIntent(event: StatsEvent) {
+    fun onIntent(event: AppEvent) {
 
         when (event) {
 
-            StatsEvent.SettingClicked -> {
-                _state.value = uiState.value.copy(showCitySelectionDialog = true)
+            AppEvent.SettingClicked -> {
+                uiState.value = uiState.value.copy(showCitySelectionDialog = true)
             }
 
-            is StatsEvent.Refresh -> {
+            is AppEvent.Refresh -> {
                 refreshData(uiState.value.city)
             }
 
-            StatsEvent.HelpClicked -> {
+            AppEvent.HelpClicked -> {
                 viewModelScope.launch {
                     viewEffects.emit(ViewEffects.ShowToast("Clicked ${event.toString()}"))
                 }
             }
 
-            StatsEvent.CityDialogDismiss -> {
-                _state.value = uiState.value.copy(showCitySelectionDialog = false)
+            AppEvent.CityDialogDismiss -> {
+                uiState.value = uiState.value.copy(showCitySelectionDialog = false)
             }
 
-            is StatsEvent.CitySelected -> {
+            is AppEvent.CityChanged -> {
 
-                viewModelScope.launch {
-                    setCityUseCase(event.city).first()
+                setCityUseCase(event.city).launchIn(viewModelScope + coroutineExceptionHandler)
+
+                uiState.update {
+                    it.copy(showCitySelectionDialog = false)
                 }
-
-                _state.value = uiState.value.copy(
-                    city = event.city,
-                    showCitySelectionDialog = false
-                )
-                getWeather(event.city)
-                getAqi(event.city)
             }
 
-            is StatsEvent.WeatherClicked -> {
+            is AppEvent.WeatherClicked -> {
                 viewModelScope.launch {
                     uiState.value.weather?.let {
                         viewEffects.emit(
@@ -103,7 +110,7 @@ class StatsViewModel @Inject constructor(
                 }
             }
 
-            is StatsEvent.AqiClicked -> {
+            is AppEvent.AqiClicked -> {
                 getAqi(uiState.value.city)
 
                 viewModelScope.launch {
@@ -111,14 +118,14 @@ class StatsViewModel @Inject constructor(
                 }
             }
 
-            is StatsEvent.TrafficClicked -> {
+            is AppEvent.TrafficClicked -> {
                 viewModelScope.launch {
                     uiState.value.aqi?.let { viewEffects.emit(ViewEffects.NavigateToAQIScreen(it)) }
                 }
 
             }
 
-            is StatsEvent.ServiceClicked -> {
+            is AppEvent.ServiceClicked -> {
                 when (event.service) {
                     Service.PUBLIC_TRANSPORT -> {
 
@@ -141,7 +148,7 @@ class StatsViewModel @Inject constructor(
                 }
             }
 
-            is StatsEvent.AlertClicked -> {
+            is AppEvent.AlertClicked -> {
                 viewModelScope.launch {
                     viewEffects.emit(ViewEffects.NavigateToAlertScreen(event.alert))
                 }
@@ -153,11 +160,11 @@ class StatsViewModel @Inject constructor(
 
     fun getWeather(city: City) {
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             getWeatherUseCase(city).collect { result ->
                 when (result) {
-                    is Result.ERROR<*> -> _state.value = uiState.value.copy(error = result.message)
-                    is Result.SUCCESS<Weather> -> _state.value =
+                    is Result.ERROR<*> -> uiState.value = uiState.value.copy(error = result.message)
+                    is Result.SUCCESS<Weather> -> uiState.value =
                         uiState.value.copy(weather = result.data)
                 }
             }
@@ -165,11 +172,14 @@ class StatsViewModel @Inject constructor(
     }
 
     fun getAqi(city: City) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO + coroutineExceptionHandler) {
             getAirQualityUseCase(city).collect { result ->
                 when (result) {
-                    is Result.ERROR<*> -> _state.value = uiState.value.copy(error = result.message)
-                    is Result.SUCCESS<AirQuality> -> _state.value = uiState.value.copy(
+                    is Result.ERROR<*> -> {
+                        uiState.value = uiState.value.copy(error = result.message)
+                    }
+
+                    is Result.SUCCESS<AirQuality> -> uiState.value = uiState.value.copy(
                         aqi = result.data
                     )
                 }

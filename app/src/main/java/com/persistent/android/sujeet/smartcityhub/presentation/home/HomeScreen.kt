@@ -38,7 +38,10 @@ import com.persistent.android.sujeet.smartcityhub.presentation.components.CitySe
 import com.persistent.android.sujeet.smartcityhub.presentation.components.HomeHeader
 import com.persistent.android.sujeet.smartcityhub.presentation.components.QuickStatsComponent
 import com.persistent.android.sujeet.smartcityhub.presentation.components.ServicesComponent
+import com.persistent.android.sujeet.smartcityhub.presentation.routes.AppEvent
 import com.persistent.android.sujeet.smartcityhub.presentation.routes.Routes
+import com.persistent.android.sujeet.smartcityhub.presentation.routes.ViewEffects
+import com.persistent.android.sujeet.smartcityhub.utils.FORMAT
 import com.persistent.android.sujeet.smartcityhub.utils.TimeUtil
 
 /**
@@ -92,7 +95,7 @@ fun HomeScreen(
                 ),
                 actions = {
                     IconButton(onClick = {
-                        viewModel.onIntent(StatsEvent.SettingClicked)
+                        viewModel.onIntent(AppEvent.SettingClicked)
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Settings,
@@ -102,7 +105,7 @@ fun HomeScreen(
                     }
                     // You can add more action icons here if needed
                     IconButton(onClick = {
-                        viewModel.onIntent(StatsEvent.Refresh(uiState.city))
+                        viewModel.onIntent(AppEvent.Refresh(uiState.city))
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Refresh,
@@ -134,28 +137,28 @@ fun HomeScreen(
                     CitySelectionDialog(
                         cities = City.entries,
                         onCitySelected = {
-                            viewModel.onIntent(StatsEvent.CitySelected(it))
+                            viewModel.onIntent(AppEvent.CityChanged(it))
                         },
                         onDismiss = {
-                            viewModel.onIntent(StatsEvent.CityDialogDismiss)
+                            viewModel.onIntent(AppEvent.CityDialogDismiss)
                         }
                     )
                 }
 
                 HomeHeader(uiState) {
-                    viewModel.onIntent(StatsEvent.SettingClicked)
+                    viewModel.onIntent(AppEvent.SettingClicked)
                 }
 
                 QuickStatsComponent(uiState) { stats ->
                     when (stats) {
-                        Stats.WEATHER -> viewModel.onIntent(StatsEvent.WeatherClicked)
-                        Stats.AQI -> viewModel.onIntent(StatsEvent.AqiClicked)
-                        Stats.TRAFFIC -> viewModel.onIntent(StatsEvent.TrafficClicked)
+                        Stats.WEATHER -> viewModel.onIntent(AppEvent.WeatherClicked)
+                        Stats.AQI -> viewModel.onIntent(AppEvent.AqiClicked)
+                        Stats.TRAFFIC -> viewModel.onIntent(AppEvent.TrafficClicked)
                     }
                 }
 
                 ServicesComponent(onServiceItemClick = { service ->
-                    viewModel.onIntent(StatsEvent.ServiceClicked(service))
+                    viewModel.onIntent(AppEvent.ServiceClicked(service))
                 })
 
 
@@ -175,12 +178,21 @@ fun HomeScreen(
                 ) {
                     uiState.alerts.forEach {
                         AlertItem(it.title, it.description) {
-                            viewModel.onIntent(StatsEvent.AlertClicked(it))
+                            viewModel.onIntent(AppEvent.AlertClicked(it))
                         }
                     }
                 }
 
-                uiState.weather?.let { Text(text = "Last Update ${TimeUtil.formatTime(it.dataTimestamp)}") }
+                uiState.weather?.let {
+                    Text(
+                        text = "Last Update ${
+                            TimeUtil.format(
+                                it.dataTimestamp,
+                                FORMAT.DEFAULT
+                            )
+                        }"
+                    )
+                }
 
             }
         }

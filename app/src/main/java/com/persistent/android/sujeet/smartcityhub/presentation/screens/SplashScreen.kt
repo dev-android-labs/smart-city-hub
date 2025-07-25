@@ -15,6 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.persistent.android.sujeet.smartcityhub.R
+import com.persistent.android.sujeet.smartcityhub.presentation.components.SmartCityComponent
 import com.persistent.android.sujeet.smartcityhub.presentation.routes.Routes
 import kotlinx.coroutines.delay
 
@@ -27,7 +28,7 @@ fun SplashScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
 
-        delay(3000)
+        delay(5000)
         navController.navigate(Routes.HomeScreen.name)
     }
 
@@ -38,6 +39,8 @@ fun SplashScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
+        SmartCityComponent()
 
         Text(
             text = stringResource(R.string.app_name),

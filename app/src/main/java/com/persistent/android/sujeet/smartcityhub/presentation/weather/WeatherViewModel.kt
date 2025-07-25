@@ -10,7 +10,7 @@ import com.persistent.android.sujeet.smartcityhub.domain.model.Weather
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCityUseCase
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCurrentWeatherUseCase
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetWeatherForecastUseCase
-import com.persistent.android.sujeet.smartcityhub.presentation.home.ViewEffects
+import com.persistent.android.sujeet.smartcityhub.presentation.routes.ViewEffects
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers

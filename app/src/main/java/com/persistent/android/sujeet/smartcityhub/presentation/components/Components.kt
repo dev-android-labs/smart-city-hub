@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,7 +34,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.persistent.android.sujeet.smartcityhub.R
+import com.persistent.android.sujeet.smartcityhub.domain.model.AirQuality
 import com.persistent.android.sujeet.smartcityhub.domain.model.Service
 import com.persistent.android.sujeet.smartcityhub.domain.model.Stats
 import com.persistent.android.sujeet.smartcityhub.presentation.home.StatsUiState
@@ -68,7 +75,7 @@ fun HomeHeader(uiState: StatsUiState, onClick: () -> Unit) {
         )
         Text(
             modifier = Modifier.clickable(onClick = onClick),
-            text = "${uiState.city.cityName}",
+            text = uiState.city.cityName,
             style = MaterialTheme.typography.labelSmall
         )
     }
@@ -388,6 +395,57 @@ fun FeatureButton(text: String, onClick: () -> Unit) {
     ) {
         Text(text = text, fontSize = 18.sp)
     }
+}
+
+@Composable
+fun AirQualityComponent(aqi: AirQuality) {
+//    val color = when (aqi.) {
+//        in 0..50 -> MaterialTheme.colorScheme.primary
+//        in 51..100 -> MaterialTheme.colorScheme.secondary
+//        in 101..150 -> MaterialTheme.colorScheme.tertiary
+//
+//        else -> {}
+//    }
+
+    Column(Modifier.fillMaxWidth()) {
+        KeyValueRow("AQI", aqi.aqi.toString())
+        KeyValueRow("CO", aqi.component.co.toString())
+        KeyValueRow("NO", aqi.component.no.toString())
+        KeyValueRow("NO2", aqi.component.no2.toString())
+        KeyValueRow("O3", aqi.component.o3.toString())
+        KeyValueRow("SO2", aqi.component.so2.toString())
+        KeyValueRow("PM2.5", aqi.component.pm2_5.toString())
+        KeyValueRow("PM10", aqi.component.pm10.toString())
+        KeyValueRow("NH3", aqi.component.nh3.toString())
+    }
+}
+
+@Composable
+fun KeyValueRow(key: String, value: String) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(key)
+        Text(value, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun SmartCityComponent() {
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_smart_city))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever // Or specify a number of iterations
+    )
+
+    LottieAnimation(
+        composition = composition,
+        progress = { progress },
+        modifier = Modifier.fillMaxWidth() // Adjust modifier as needed
+    )
 }
 
 

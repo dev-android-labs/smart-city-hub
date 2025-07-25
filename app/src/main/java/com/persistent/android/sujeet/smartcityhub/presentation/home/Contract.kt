@@ -52,36 +52,38 @@ data class StatsUiState(
     val error: String? = null,
 )
 
-sealed class StatsEvent {
+//sealed class StatsEvent {
+//
+//
+//    object BackClicked : StatsEvent()
+//    object RefreshClicked : StatsEvent()
+//    data class Refresh(val city: City) : StatsEvent()
+//
+//    object LoadWeather : StatsEvent()
+//    object LoadAQI : StatsEvent()
+//    object LoadTraffic : StatsEvent()
+//
+//    object SettingClicked : StatsEvent()
+//    object HelpClicked : StatsEvent()
+//    object CityDialogDismiss : StatsEvent()
+//
+//    data class CityChanged(val city: City) : StatsEvent()
+//
+//    object WeatherClicked : StatsEvent()
+//    object AqiClicked : StatsEvent()
+//    object TrafficClicked : StatsEvent()
+//
+//    data class ServiceClicked(val service: Service) : StatsEvent()
+//    data class AlertClicked(val alert: Alert) : StatsEvent()
+//
+//}
 
-
-    data class Refresh(val city: City) : StatsEvent()
-
-    object LoadWeather : StatsEvent()
-    object LoadAQI : StatsEvent()
-    object LoadTraffic : StatsEvent()
-
-    object SettingClicked : StatsEvent()
-    object HelpClicked : StatsEvent()
-    object CityDialogDismiss : StatsEvent()
-
-    data class CitySelected(val city: City) : StatsEvent()
-
-    object WeatherClicked : StatsEvent()
-    object AqiClicked : StatsEvent()
-    object TrafficClicked : StatsEvent()
-
-    data class ServiceClicked(val service: Service) : StatsEvent()
-    data class AlertClicked(val alert: Alert) : StatsEvent()
-
-}
-
-sealed class ViewEffects() {
-
-    object NavigateBack : ViewEffects()
-    data class NavigateToWeatherScreen(val weather: Weather) : ViewEffects()
-    data class NavigateToAQIScreen(val aqi: AirQuality) : ViewEffects()
-    data class NavigateToAlertScreen(val alert: Alert) : ViewEffects()
-    data class ShowToast(val message: String) : ViewEffects()
-    data class ShowSnackBar(val message: String) : ViewEffects()
-}
+//sealed class ViewEffects() {
+//
+//    object NavigateBack : ViewEffects()
+//    data class NavigateToWeatherScreen(val weather: Weather) : ViewEffects()
+//    data class NavigateToAQIScreen(val aqi: AirQuality) : ViewEffects()
+//    data class NavigateToAlertScreen(val alert: Alert) : ViewEffects()
+//    data class ShowToast(val message: String) : ViewEffects()
+//    data class ShowSnackBar(val message: String) : ViewEffects()
+//}

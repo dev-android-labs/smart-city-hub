@@ -9,17 +9,23 @@ import java.util.Locale
  */
 object TimeUtil {
 
-    fun formatTime(time: Long): String {
-        val date = Date(time)
-        val format = SimpleDateFormat("dd-MMM-yyyy hh:mm a", Locale.getDefault())
-        return format.format(date)
+    fun format(timestamp: Long): String {
+        return SimpleDateFormat(
+            FORMAT.DEFAULT.pattern,
+            Locale.getDefault()
+        ).format(Date(timestamp * 1000))
     }
 
-    fun formatDateTime(timestamp: Long): String {
-        return SimpleDateFormat("EEE, MMM d", Locale.getDefault()).format(Date(timestamp * 1000))
+    fun format(timestamp: Long, format: FORMAT): String {
+        return SimpleDateFormat(format.pattern, Locale.getDefault()).format(Date(timestamp * 1000))
     }
 
-    fun formatHHmm(timestamp: Long): String {
-        return SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(timestamp * 1000))
-    }
+}
+
+enum class FORMAT(val pattern: String) {
+    DEFAULT("dd-MMM-yyyy hh:mm a"),
+    TIMESTAMP("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
+    EEE_MMM_D("EEE, MMM d"),
+    HH_MM("HH:mm"),
+    DEFAULT_TIMESTAMP("EEE, MMM d HH:mm"),
 }

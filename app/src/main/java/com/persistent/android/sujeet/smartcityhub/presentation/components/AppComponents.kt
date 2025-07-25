@@ -26,9 +26,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.persistent.android.sujeet.smartcityhub.domain.model.Forecast
 import com.persistent.android.sujeet.smartcityhub.domain.model.Weather
+import com.persistent.android.sujeet.smartcityhub.utils.FORMAT
 import com.persistent.android.sujeet.smartcityhub.utils.TimeUtil
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -36,7 +35,7 @@ import kotlin.math.roundToInt
  * Created by SUJEET KUMAR on 7/20/2025
  */
 @Composable
-fun WeatherCard(weather: Weather){
+fun WeatherCard(weather: Weather) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -58,35 +57,40 @@ fun WeatherCard(weather: Weather){
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                weather.iconUrl?.let { url ->
-                    AsyncImage(
-                        model = url,
-                        contentDescription = weather.condition,
-                        modifier = Modifier.size(80.dp)
-                    )
-                }
+                AsyncImage(
+                    model = weather.getIconImageUrl(),
+                    contentDescription = weather.condition,
+                    modifier = Modifier.size(80.dp)
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "${weather.temperature}°C",
+                    text = "${weather.temperature.roundToInt()}°C",
                     fontSize = 48.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Text(
-                text = weather.description.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
+                text = weather.description.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(
+                        Locale.getDefault()
+                    ) else it.toString()
+                },
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(modifier = Modifier.height(16.dp))
-            WeatherDetailRow(label = "Feels like", value = "${weather.feelsLike}°C")
+            WeatherDetailRow(label = "Feels like", value = "${weather.feelsLike.roundToInt()}°C")
             WeatherDetailRow(label = "Humidity", value = "${weather.humidity}%")
             WeatherDetailRow(label = "Wind Speed", value = "${weather.windSpeed} m/s")
             WeatherDetailRow(label = "Pressure", value = "${weather.pressure} hPa")
-            WeatherDetailRow(label = "Min/Max Temp", value = "${weather.minTemp}°C / ${weather.maxTemp}°C")
+            WeatherDetailRow(
+                label = "Min/Max Temp",
+                value = "${weather.minTemp.roundToInt()}°C / ${weather.maxTemp.roundToInt()}°C"
+            )
             WeatherDetailRow(
                 label = "Last Updated",
-                value = SimpleDateFormat("HH:mm, dd MMM", Locale.getDefault()).format(Date(weather.dataTimestamp * 1000))
+                value = TimeUtil.format(weather.dataTimestamp, FORMAT.DEFAULT_TIMESTAMP)
             )
         }
     }
@@ -101,7 +105,11 @@ fun WeatherDetailRow(label: String, value: String) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(text = label, style = MaterialTheme.typography.bodyMedium)
-        Text(text = value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
@@ -135,12 +143,12 @@ fun ForecastItemCard(forecast: Forecast) {
         ) {
             Column {
                 Text(
-                    text = TimeUtil.formatDateTime(forecast.timestamp),
+                    text = TimeUtil.format(forecast.timestamp, FORMAT.EEE_MMM_D),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
                 Text(
-                    text = TimeUtil.formatHHmm(forecast.timestamp),
+                    text = TimeUtil.format(forecast.timestamp, FORMAT.HH_MM),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -168,7 +176,11 @@ fun ForecastItemCard(forecast: Forecast) {
                 }
             }
             Text(
-                text = forecast.description.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() },
+                text = forecast.description.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(
+                        Locale.getDefault()
+                    ) else it.toString()
+                },
                 fontSize = 14.sp,
                 modifier = Modifier
                     .weight(1f)
@@ -181,5 +193,5 @@ fun ForecastItemCard(forecast: Forecast) {
 
 @Preview
 @Composable
-fun WeatherCardPreview(){
+fun WeatherCardPreview() {
 }

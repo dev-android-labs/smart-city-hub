@@ -33,7 +33,7 @@ data class WeatherResponse(
             sunset = sys.sunset,
             lat = coord.lat,
             lon = coord.lon,
-            dataTimestamp = System.currentTimeMillis(),
+            dataTimestamp = dt,
         )
     }
 }

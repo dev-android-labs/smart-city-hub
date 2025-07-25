@@ -90,7 +90,7 @@ fun PreviewTextWithNextIconRow() {
             leadingIcon = Icons.Filled.Info // Example with a leading icon
         )
         TextWithNextIconRow(
-            text = "SettingsSettingsSettingsSettingsSettingsSettings",
+            text = "Settings",
             onClick = { /* Navigate to settings */ }
         )
         TextWithNextIconRow(

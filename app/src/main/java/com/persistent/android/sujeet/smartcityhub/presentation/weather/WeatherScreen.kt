@@ -1,5 +1,6 @@
 package com.persistent.android.sujeet.smartcityhub.presentation.weather
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,17 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -29,11 +24,13 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.persistent.android.sujeet.smartcityhub.presentation.components.AppBarTop
 import com.persistent.android.sujeet.smartcityhub.presentation.components.ForecastListComponent
 import com.persistent.android.sujeet.smartcityhub.presentation.components.LoadingIndicator
 import com.persistent.android.sujeet.smartcityhub.presentation.components.ShowError
 import com.persistent.android.sujeet.smartcityhub.presentation.components.WeatherCard
-import com.persistent.android.sujeet.smartcityhub.presentation.home.ViewEffects
+import com.persistent.android.sujeet.smartcityhub.presentation.routes.AppEvent
+import com.persistent.android.sujeet.smartcityhub.presentation.routes.ViewEffects
 
 /**
  * Created by SUJEET KUMAR on 7/20/2025
@@ -60,27 +57,29 @@ fun WeatherScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Weather") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
-                navigationIcon = {
-                    Button(onClick = {
+            AppBarTop(
+                "Weather",
+                backEnabled = true,
+                refreshEnabled = true,
+                settingsEnabled = true
+            ) { actionEvent ->
+                when (actionEvent) {
+                    is AppEvent.BackClicked -> {
                         viewModel.onIntent(WeatherEvent.BackClicked)
-                    }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
-                },
-                actions = {
-                    Button(onClick = {
+
+                    is AppEvent.RefreshClicked -> {
                         viewModel.onIntent(WeatherEvent.Refresh(state.city))
-                    }) {
-                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                     }
+
+                    is AppEvent.SettingClicked -> {
+                        Log.d("TAG", "WeatherScreen: $actionEvent")
+
+                    }
+
+                    else -> {}
                 }
-            )
+            }
         }
     ) { innerPadding ->
         Column(
