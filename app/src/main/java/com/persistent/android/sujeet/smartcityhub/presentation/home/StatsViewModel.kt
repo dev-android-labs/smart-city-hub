@@ -58,12 +58,10 @@ class StatsViewModel @Inject constructor(
 //        Keep updating the data every 1 minute
         viewModelScope.launch {
             while (isActive) {
-                delay(1000 * 30 * 1)
+                delay(1000 * 60 * 3)
                 refreshData(city = uiState.value.city)
             }
         }
-
-
     }
 
 
@@ -71,18 +69,12 @@ class StatsViewModel @Inject constructor(
 
         when (event) {
 
-            AppEvent.SettingClicked -> {
+            AppEvent.ActionSettingClicked -> {
                 uiState.value = uiState.value.copy(showCitySelectionDialog = true)
             }
 
-            is AppEvent.Refresh -> {
+            is AppEvent.ActionRefreshClicked -> {
                 refreshData(uiState.value.city)
-            }
-
-            AppEvent.HelpClicked -> {
-                viewModelScope.launch {
-                    viewEffects.emit(ViewEffects.ShowToast("Clicked ${event.toString()}"))
-                }
             }
 
             AppEvent.CityDialogDismiss -> {
@@ -119,10 +111,13 @@ class StatsViewModel @Inject constructor(
             }
 
             is AppEvent.TrafficClicked -> {
-                viewModelScope.launch {
-                    uiState.value.aqi?.let { viewEffects.emit(ViewEffects.NavigateToAQIScreen(it)) }
+                uiState.update {
+                    it.copy(error = "Feature not implemented")
                 }
+            }
 
+            AppEvent.ErrorDialogConfirmClicked -> {
+                uiState.value = uiState.value.copy(error = null)
             }
 
             is AppEvent.ServiceClicked -> {
@@ -167,6 +162,8 @@ class StatsViewModel @Inject constructor(
                     is Result.SUCCESS<Weather> -> uiState.value =
                         uiState.value.copy(weather = result.data)
                 }
+
+                uiState.value = uiState.value.copy(isLoading = false)
             }
         }
     }
@@ -183,11 +180,14 @@ class StatsViewModel @Inject constructor(
                         aqi = result.data
                     )
                 }
+
+                uiState.value = uiState.value.copy(isLoading = false)
             }
         }
     }
 
     fun refreshData(city: City) {
+        uiState.value = uiState.value.copy(isLoading = true)
         getWeather(city)
         getAqi(city)
     }

@@ -10,13 +10,14 @@ import com.persistent.android.sujeet.smartcityhub.domain.model.Service
 sealed class AppEvent {
 
     object BackClicked : AppEvent()
-    object RefreshClicked : AppEvent()
-    object SettingClicked : AppEvent()
-    object HelpClicked : AppEvent()
+    object ActionRefreshClicked : AppEvent()
+    object ActionSettingClicked : AppEvent()
+    object ActionHelpClicked : AppEvent()
 
     data class Refresh(val city: City) : AppEvent()
 
     object LoadWeather : AppEvent()
+    object LoadWeatherForecast : AppEvent()
     object LoadAQI : AppEvent()
     object LoadTraffic : AppEvent()
 
@@ -30,5 +31,7 @@ sealed class AppEvent {
 
     data class ServiceClicked(val service: Service) : AppEvent()
     data class AlertClicked(val alert: Alert) : AppEvent()
+
+    object ErrorDialogConfirmClicked : AppEvent()
 
 }

@@ -1,5 +1,7 @@
 package com.persistent.android.sujeet.smartcityhub.presentation.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,23 +13,37 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.persistent.android.sujeet.smartcityhub.R
+import com.persistent.android.sujeet.smartcityhub.domain.model.AirQuality
+import com.persistent.android.sujeet.smartcityhub.domain.model.City
+import com.persistent.android.sujeet.smartcityhub.domain.model.Component
 import com.persistent.android.sujeet.smartcityhub.domain.model.Forecast
 import com.persistent.android.sujeet.smartcityhub.domain.model.Weather
 import com.persistent.android.sujeet.smartcityhub.utils.FORMAT
 import com.persistent.android.sujeet.smartcityhub.utils.TimeUtil
+import kotlinx.coroutines.launch
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -185,7 +201,99 @@ fun ForecastItemCard(forecast: Forecast) {
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 8.dp),
-                textAlign = androidx.compose.ui.text.style.TextAlign.End
+                textAlign = TextAlign.End
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AQICard(aqi: AirQuality, city: City = City.BANGALORE) {
+
+    val scope = rememberCoroutineScope()
+    val itemOneTooltipState = rememberTooltipState()
+
+    val color = when (aqi.aqi) {
+        1 -> colorResource(R.color.green_500)
+        2 -> colorResource(R.color.yellow_500)
+        3 -> colorResource(R.color.orange_500)
+        4 -> colorResource(R.color.red_500)
+        5 -> colorResource(R.color.maroon_500)
+
+        else -> {
+            MaterialTheme.colorScheme.surface
+        }
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = city.cityName,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Air Quality",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Column(
+                Modifier
+                    .background(shape = RoundedCornerShape(48), color = color)
+                    .padding(horizontal = 32.dp, vertical = 8.dp),
+            ) {
+                Text(
+                    text = aqi.getLevel().level.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(
+                            Locale.getDefault()
+                        ) else it.toString()
+                    },
+                    fontSize = 48.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = aqi.getLevel().description.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(
+                        Locale.getDefault()
+                    ) else it.toString()
+                },
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            AirQualityComponent(aqi)
+
+            Text(
+                text = "Pollutant concentration in μg/m3",
+                fontSize = 12.sp,
+                modifier = Modifier.padding(top = 16.dp),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
             )
         }
     }
@@ -194,4 +302,35 @@ fun ForecastItemCard(forecast: Forecast) {
 @Preview
 @Composable
 fun WeatherCardPreview() {
+    Column {
+
+        WeatherCard(
+            weather = Weather(
+                cityName = "Bangalore",
+                temperature = 27.0,
+                feelsLike = 23.0,
+                minTemp = 21.0,
+                maxTemp = 31.0,
+                pressure = 1049,
+                humidity = 98,
+                condition = "Cloudy",
+                description = "Cloudy with a chance of meatballs",
+                iconUrl = "",
+                windSpeed = 22.9,
+                sunrise = System.currentTimeMillis(),
+                sunset = System.currentTimeMillis(),
+                lat = 79.2,
+                lon = 23.5,
+                dataTimestamp = System.currentTimeMillis(),
+                icon = "02"
+            )
+        )
+
+        AQICard(
+            aqi = AirQuality(
+                aqi = 4,
+                component = Component(),
+            )
+        )
+    }
 }

@@ -32,7 +32,7 @@ class AirQualityViewModel @Inject constructor(
 
 
     fun onIntent(event: AppEvent) {
-        Log.d("TAG", "onIntent: ${event}")
+        Log.d("TAG", "onIntent: $event")
         when (event) {
             is AppEvent.BackClicked -> {
                 viewModelScope.launch {
@@ -40,12 +40,23 @@ class AirQualityViewModel @Inject constructor(
                 }
             }
 
-            is AppEvent.RefreshClicked -> {
+            is AppEvent.ActionRefreshClicked -> {
                 getAirQuality()
             }
 
-            is AppEvent.SettingClicked -> {
+            is AppEvent.ActionSettingClicked -> {
+                uiState.update {
+                    it.copy(showCitySelectionDialog = true)
+                }
+            }
 
+            is AppEvent.CityDialogDismiss -> {
+                uiState.update { it.copy(showCitySelectionDialog = false) }
+            }
+
+            is AppEvent.CityChanged -> {
+                uiState.update { it.copy(city = event.city, showCitySelectionDialog = false) }
+                getAirQuality()
             }
 
             else -> {
@@ -71,7 +82,7 @@ class AirQualityViewModel @Inject constructor(
                 when (result) {
                     is Result.ERROR<*> -> uiState.update { it.copy(error = result.message) }
                     is Result.SUCCESS<AirQuality> -> uiState.update {
-                        AirQualityUiState(aqi = result.data)
+                        AirQualityUiState(aqi = result.data, city = it.city)
                     }
                 }
 

@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -399,37 +400,36 @@ fun FeatureButton(text: String, onClick: () -> Unit) {
 
 @Composable
 fun AirQualityComponent(aqi: AirQuality) {
-//    val color = when (aqi.) {
-//        in 0..50 -> MaterialTheme.colorScheme.primary
-//        in 51..100 -> MaterialTheme.colorScheme.secondary
-//        in 101..150 -> MaterialTheme.colorScheme.tertiary
-//
-//        else -> {}
-//    }
-
-    Column(Modifier.fillMaxWidth()) {
-        KeyValueRow("AQI", aqi.aqi.toString())
-        KeyValueRow("CO", aqi.component.co.toString())
-        KeyValueRow("NO", aqi.component.no.toString())
-        KeyValueRow("NO2", aqi.component.no2.toString())
-        KeyValueRow("O3", aqi.component.o3.toString())
-        KeyValueRow("SO2", aqi.component.so2.toString())
-        KeyValueRow("PM2.5", aqi.component.pm2_5.toString())
-        KeyValueRow("PM10", aqi.component.pm10.toString())
-        KeyValueRow("NH3", aqi.component.nh3.toString())
+    Column(
+        Modifier
+            .fillMaxWidth()
+    ) {
+        KeyValueRow("CO", "${aqi.component.co}")
+        KeyValueRow("NO", "${aqi.component.no}")
+        KeyValueRow("NO2", "${aqi.component.no2}")
+        KeyValueRow("O3", "${aqi.component.o3}")
+        KeyValueRow("SO2", "${aqi.component.so2}")
+        KeyValueRow("PM2.5", "${aqi.component.pm2_5}")
+        KeyValueRow("PM10", "${aqi.component.pm10}")
+        KeyValueRow("NH3", "${aqi.component.nh3}")
     }
 }
 
+
 @Composable
-fun KeyValueRow(key: String, value: String) {
+fun KeyValueRow(label: String, value: String) {
     Row(
-        Modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp),
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(key)
-        Text(value, fontWeight = FontWeight.Bold)
+        Text(text = label, style = MaterialTheme.typography.bodyMedium)
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 

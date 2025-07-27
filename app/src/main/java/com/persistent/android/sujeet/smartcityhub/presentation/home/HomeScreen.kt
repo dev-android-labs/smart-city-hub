@@ -35,8 +35,10 @@ import com.persistent.android.sujeet.smartcityhub.domain.model.City
 import com.persistent.android.sujeet.smartcityhub.domain.model.Stats
 import com.persistent.android.sujeet.smartcityhub.presentation.components.AlertItem
 import com.persistent.android.sujeet.smartcityhub.presentation.components.CitySelectionDialog
+import com.persistent.android.sujeet.smartcityhub.presentation.components.DialogError
 import com.persistent.android.sujeet.smartcityhub.presentation.components.HomeHeader
 import com.persistent.android.sujeet.smartcityhub.presentation.components.QuickStatsComponent
+import com.persistent.android.sujeet.smartcityhub.presentation.components.ScreenLoadingIndicator
 import com.persistent.android.sujeet.smartcityhub.presentation.components.ServicesComponent
 import com.persistent.android.sujeet.smartcityhub.presentation.routes.AppEvent
 import com.persistent.android.sujeet.smartcityhub.presentation.routes.Routes
@@ -95,7 +97,7 @@ fun HomeScreen(
                 ),
                 actions = {
                     IconButton(onClick = {
-                        viewModel.onIntent(AppEvent.SettingClicked)
+                        viewModel.onIntent(AppEvent.ActionSettingClicked)
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Settings,
@@ -105,7 +107,7 @@ fun HomeScreen(
                     }
                     // You can add more action icons here if needed
                     IconButton(onClick = {
-                        viewModel.onIntent(AppEvent.Refresh(uiState.city))
+                        viewModel.onIntent(AppEvent.ActionRefreshClicked)
                     }) {
                         Icon(
                             imageVector = Icons.Filled.Refresh,
@@ -146,7 +148,7 @@ fun HomeScreen(
                 }
 
                 HomeHeader(uiState) {
-                    viewModel.onIntent(AppEvent.SettingClicked)
+                    viewModel.onIntent(AppEvent.ActionSettingClicked)
                 }
 
                 QuickStatsComponent(uiState) { stats ->
@@ -160,7 +162,6 @@ fun HomeScreen(
                 ServicesComponent(onServiceItemClick = { service ->
                     viewModel.onIntent(AppEvent.ServiceClicked(service))
                 })
-
 
                 Text(
                     text = "City Alerts",
@@ -193,7 +194,16 @@ fun HomeScreen(
                         }"
                     )
                 }
+            }
 
+            if (uiState.isLoading) {
+                ScreenLoadingIndicator()
+            }
+
+            uiState.error?.let {
+                DialogError(message = it) {
+                    viewModel.onIntent(AppEvent.ErrorDialogConfirmClicked)
+                }
             }
         }
     }

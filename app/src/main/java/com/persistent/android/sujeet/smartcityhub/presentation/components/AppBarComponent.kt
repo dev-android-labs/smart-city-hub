@@ -50,7 +50,7 @@ fun AppBarTop(
             if (settingsEnabled) {
                 IconButton(
                     onClick =
-                        { onEvent(AppEvent.SettingClicked) }
+                        { onEvent(AppEvent.ActionSettingClicked) }
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Settings,
@@ -63,7 +63,7 @@ fun AppBarTop(
             // You can add more action icons here if needed
             if (refreshEnabled) {
                 IconButton(onClick = {
-                    onEvent(AppEvent.RefreshClicked)
+                    onEvent(AppEvent.ActionRefreshClicked)
                 }) {
                     Icon(
                         imageVector = Icons.Filled.Refresh,

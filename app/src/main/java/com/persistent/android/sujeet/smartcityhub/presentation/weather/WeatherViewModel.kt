@@ -10,6 +10,8 @@ import com.persistent.android.sujeet.smartcityhub.domain.model.Weather
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCityUseCase
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetCurrentWeatherUseCase
 import com.persistent.android.sujeet.smartcityhub.domain.usecases.GetWeatherForecastUseCase
+import com.persistent.android.sujeet.smartcityhub.domain.usecases.SetCityUseCase
+import com.persistent.android.sujeet.smartcityhub.presentation.routes.AppEvent
 import com.persistent.android.sujeet.smartcityhub.presentation.routes.ViewEffects
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -18,6 +20,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -33,6 +36,7 @@ class WeatherViewModel @Inject constructor(
     private val getCurrentWeatherUseCase: GetCurrentWeatherUseCase,
     private val getForecastUseCase: GetWeatherForecastUseCase,
     private val getCityUseCase: GetCityUseCase,
+    private val setCityUseCase: SetCityUseCase,
 ) : ViewModel() {
 
     private val coroutineExceptionHandler =
@@ -65,32 +69,47 @@ class WeatherViewModel @Inject constructor(
                 }
             }
         }
-
     }
 
-    fun onIntent(intent: WeatherEvent) {
+    fun onIntent(intent: AppEvent) {
 
         Log.d("TAG", "onIntent: ${intent.toString()}")
 
         when (intent) {
-            is WeatherEvent.Refresh -> {
-                getCurrentWeather(intent.city)
-                getForecast(intent.city)
-            }
 
-            is WeatherEvent.RefreshWeather -> {
-                getCurrentWeather(intent.city)
-            }
-
-            is WeatherEvent.RefreshForecast -> {
-                getForecast(city = intent.city)
-            }
-
-            WeatherEvent.BackClicked -> {
+            AppEvent.BackClicked -> {
                 viewModelScope.launch {
                     viewEffects.emit(ViewEffects.NavigateBack)
                 }
             }
+
+            is AppEvent.CityChanged -> {
+                setCityUseCase.invoke(intent.city).launchIn(viewModelScope)
+                uiState.update { it.copy(showCitySelectionDialog = false) }
+            }
+
+            AppEvent.CityDialogDismiss -> {
+                uiState.update { it.copy(showCitySelectionDialog = false) }
+            }
+
+            AppEvent.LoadWeather -> {
+                getCurrentWeather(city = uiState.value.city)
+            }
+
+            AppEvent.LoadWeatherForecast -> {
+                getForecast(city = uiState.value.city)
+            }
+
+            AppEvent.ActionRefreshClicked -> {
+                getCurrentWeather(city = uiState.value.city)
+                getForecast(city = uiState.value.city)
+            }
+
+            AppEvent.ActionSettingClicked -> {
+                uiState.update { it.copy(showCitySelectionDialog = true) }
+            }
+
+            else -> {}
         }
     }
 

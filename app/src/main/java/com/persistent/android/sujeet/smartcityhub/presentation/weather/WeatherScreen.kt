@@ -1,6 +1,5 @@
 package com.persistent.android.sujeet.smartcityhub.presentation.weather
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,7 +23,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.persistent.android.sujeet.smartcityhub.domain.model.City
 import com.persistent.android.sujeet.smartcityhub.presentation.components.AppBarTop
+import com.persistent.android.sujeet.smartcityhub.presentation.components.CitySelectionDialog
 import com.persistent.android.sujeet.smartcityhub.presentation.components.ForecastListComponent
 import com.persistent.android.sujeet.smartcityhub.presentation.components.LoadingIndicator
 import com.persistent.android.sujeet.smartcityhub.presentation.components.ShowError
@@ -38,7 +39,7 @@ import com.persistent.android.sujeet.smartcityhub.presentation.routes.ViewEffect
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherScreen(
-    state: WeatherUiState = WeatherUiState(),
+    uiState: WeatherUiState = WeatherUiState(),
     viewModel: WeatherViewModel = viewModel(),
     navController: NavController = rememberNavController(),
 ) {
@@ -65,47 +66,58 @@ fun WeatherScreen(
             ) { actionEvent ->
                 when (actionEvent) {
                     is AppEvent.BackClicked -> {
-                        viewModel.onIntent(WeatherEvent.BackClicked)
+                        viewModel.onIntent(AppEvent.BackClicked)
                     }
 
-                    is AppEvent.RefreshClicked -> {
-                        viewModel.onIntent(WeatherEvent.Refresh(state.city))
+                    is AppEvent.ActionSettingClicked -> {
+                        viewModel.onIntent(AppEvent.ActionSettingClicked)
                     }
 
-                    is AppEvent.SettingClicked -> {
-                        Log.d("TAG", "WeatherScreen: $actionEvent")
-
+                    is AppEvent.ActionRefreshClicked -> {
+                        viewModel.onIntent(AppEvent.ActionRefreshClicked)
                     }
 
                     else -> {}
                 }
             }
-        }
+        },
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
                 .background(color = MaterialTheme.colorScheme.primaryContainer)
         ) {
-
             Column(
                 modifier = Modifier
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
-                if (state.isLoading) {
+                if (uiState.showCitySelectionDialog) {
+                    CitySelectionDialog(
+                        cities = City.entries,
+                        onCitySelected = {
+                            viewModel.onIntent(AppEvent.CityChanged(it))
+                        },
+                        onDismiss = {
+                            viewModel.onIntent(AppEvent.CityDialogDismiss)
+                        }
+                    )
+                }
+
+                if (uiState.isLoading) {
                     LoadingIndicator("Loading weather data...")
-                } else if (state.error != null) {
-                    ShowError(state.error) {
-                        viewModel.onIntent(WeatherEvent.RefreshWeather(state.city))
+                } else if (uiState.error != null) {
+                    ShowError(uiState.error) {
+                        viewModel.onIntent(AppEvent.LoadWeather)
                     }
-                } else if (state.weather != null) {
-                    WeatherCard(weather = state.weather)
+                } else if (uiState.weather != null) {
+                    WeatherCard(weather = uiState.weather)
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    state.forecasts?.let { forecasts ->
+                    uiState.forecasts?.let { forecasts ->
                         if (forecasts.isNotEmpty()) {
                             Text(
                                 text = "Forecast",
@@ -123,7 +135,7 @@ fun WeatherScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = {
-                        viewModel.onIntent(WeatherEvent.RefreshForecast(state.city))
+                        viewModel.onIntent(AppEvent.LoadWeatherForecast)
                     }) {
                         Text("Refresh Forecast")
                     }
@@ -132,7 +144,7 @@ fun WeatherScreen(
                         "No weather data available. Please check your internet connection or try again.",
                         "Load Weather"
                     ) {
-                        viewModel.onIntent(WeatherEvent.RefreshWeather(state.city))
+                        viewModel.onIntent(AppEvent.LoadWeather)
                     }
                 }
             }
