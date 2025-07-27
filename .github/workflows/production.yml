@@ -45,8 +45,6 @@ jobs:
         id: apk-path
         run: |
           path=$(find **/build/outputs/apk/release -name '*.apk' -type f | head -1)
-#          path=$(find **/build/outputs/apk/production/release -name '*.apk' -type f | head -1)
-
           echo "::set-output name=path::$path"
 
       - name: Extracting apk info
