@@ -87,7 +87,7 @@ jobs:
 
       #Uploading Staging Release apk to artifact
       - name: Upload Apk to artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.apk-info.outputs.application-name }}-${{ steps.apk-info.outputs.version-name }}.apk
           path: app/build/outputs/apk/production/release/**.apk
