@@ -4,6 +4,9 @@ on:
   push:
     branches: [ "master" ]
 
+permissions:
+  contents: write
+
 jobs:
 
   #  This is job1
@@ -90,4 +93,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.apk-info.outputs.application-name }}-${{ steps.apk-info.outputs.version-name }}.apk
-          path: app/build/outputs/apk/production/release/**.apk
+          path: app/build/outputs/apk/release/**.apk
